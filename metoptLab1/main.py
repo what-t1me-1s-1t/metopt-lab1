@@ -68,28 +68,83 @@ def pick_estimates(positions):
     return best_x, best_y
 
 
-def gradient_descent(best_estimates, is_x):
-    derivative = derivative_x if is_x else derivative_y
-    best_x, best_y = best_estimates
-    descent_step = step
-    value = derivative(best_x, best_y)  # Исправлен порядок аргументов
+def gradient_descent(initial_point, method='armijo', max_iter=1000, **kwargs):
+    x, y = initial_point
+    trajectory = [(x, y)]
 
-    while abs(value) > global_epsilon:
-        descent_step *= 0.95
-        if is_x:
-            best_x = best_x - descent_step if value > 0 else best_x + descent_step
+    for _ in range(max_iter):
+        dx = derivative_x(x, y)
+        dy = derivative_y(x, y)
+        grad = np.array([dx, dy])
+        direction = -grad
+
+        if method == 'armijo':
+            alpha = armijo_line_search(x, y, direction, **kwargs)
+        elif method == 'wolfe':
+            alpha = wolfe_line_search(x, y, direction, **kwargs)
         else:
-            best_y = best_y - descent_step if value > 0 else best_y + descent_step
-        value = derivative(best_x, best_y)  # Исправлен порядок
+            alpha = kwargs.get('learning_rate', 0.000000001)
 
-    return (best_x, best_y) if is_x else (best_x, best_y)
+        x_new = x + alpha * direction[0]
+        y_new = y + alpha * direction[1]
+
+        if np.linalg.norm([x_new - x, y_new - y]) < global_epsilon:
+            break
+
+        x, y = x_new, y_new
+        trajectory.append((x, y))
+
+    return x, y
+
+
+def armijo_line_search(x, y, direction, alpha_init=1.0, c1=1e-4, rho=0.5, max_iters=10):
+    alpha = alpha_init
+    f_current = differentiable_function(x, y)
+    grad = np.array([derivative_x(x, y), derivative_y(x, y)])
+    slope = c1 * np.dot(grad, direction)
+
+    for _ in range(max_iters):
+        x_new = x + alpha * direction[0]
+        y_new = y + alpha * direction[1]
+        f_new = differentiable_function(x_new, y_new)
+
+        if f_new <= f_current + alpha * slope:
+            return alpha
+        alpha *= rho
+
+    return alpha_init * (rho ** max_iters)
+
+
+def wolfe_line_search(x, y, direction, alpha_init=1.0, c1=1e-4, c2=0.9, max_iters=20):
+    alpha = alpha_init
+    f_current = differentiable_function(x, y)
+    grad_current = np.array([derivative_x(x, y), derivative_y(x, y)])
+    slope = c1 * np.dot(grad_current, direction)
+
+    for _ in range(max_iters):
+        x_new = x + alpha * direction[0]
+        y_new = y + alpha * direction[1]
+        f_new = differentiable_function(x_new, y_new)
+        grad_new = np.array([derivative_x(x_new, y_new), derivative_y(x_new, y_new)])
+
+        if f_new > f_current + alpha * slope:
+            alpha *= 0.5
+            continue
+
+        if np.dot(grad_new, direction) < c2 * np.dot(grad_current, direction):
+            alpha *= 1.5
+            continue
+
+        return alpha
+
+    return alpha
+
 
 
 def find_minimum():
-    estimates = pick_estimates(calculate_flip_points())
-    optimized_y = gradient_descent(estimates, is_x=False)
-    optimized_x = gradient_descent(optimized_y, is_x=True)
-    return optimized_x
+    flip_points = calculate_flip_points()
+    initial_guess = pick_estimates(flip_points)
+    return gradient_descent(initial_guess, method='wolfe')
 
 
 def get_grid(grid_step):
