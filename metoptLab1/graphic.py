@@ -1,9 +1,17 @@
 import matplotlib
+import numpy as np
 
 matplotlib.use('Agg')
 import matplotlib.pyplot as plot
-from math_logic import find_minimum, get_grid, differentiable_function
+from math_logic import find_minimum,  differentiable_function
 
+
+radius = 8
+
+def get_grid(grid_step):
+    samples = np.arange(-radius, radius, grid_step)
+    x, y = np.meshgrid(samples, samples)
+    return x, y, differentiable_function(x, y)
 
 def draw_chart(point, grid):
     point_x, point_y, point_z = point
@@ -20,9 +28,9 @@ def draw_chart(point, grid):
     plot.savefig('chart.png')
 
 
-if __name__ == '__main__':
-    min_x, min_y = find_minimum()
-    minimum = (min_x, min_y, differentiable_function(min_x, min_y))
-    grid = get_grid(0.05)
-    draw_chart(minimum, grid)
-    print(minimum)
+# if __name__ == '__main__':
+#     min_x, min_y = find_minimum()
+#     minimum = (min_x, min_y, differentiable_function(min_x, min_y))
+#     grid = get_grid(0.05)
+#     draw_chart(minimum, grid)
+#     print(minimum)

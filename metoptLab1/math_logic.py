@@ -7,6 +7,50 @@ arr_shape = 100
 step = radius / arr_shape
 
 
+
+
+
+# def calculate_flip_points():
+#     flip_points = np.array([0, 0])
+#     points = np.zeros((360, arr_shape), dtype=bool)
+#     cx, cy = centre
+#
+#     for i in range(arr_shape):
+#         for alpha in range(360):
+#             x, y = rotate_vector(step, alpha)
+#             x = x * i + cx
+#             y = y * i + cy
+#             points[alpha][i] = derivative_x(x, y) + derivative_y(x, y) > 0
+#             if i > 0 and not points[alpha][i - 1] and points[alpha][i]:
+#                 flip_points = np.vstack((flip_points, np.array([alpha, i - 1])))
+#
+#     return flip_points
+
+#
+# def pick_estimates(positions):
+#     if len(positions) < 2:
+#         return centre
+#
+#     vx, vy = rotate_vector(step, positions[1][0])
+#     cx, cy = centre
+#     best_x, best_y = cx + vx * positions[1][1], cy + vy * positions[1][1]
+#
+#     for index in range(2, len(positions)):
+#         vx, vy = rotate_vector(step, positions[index][0])
+#         x, y = cx + vx * positions[index][1], cy + vy * positions[index][1]
+#         if differentiable_function(best_x, best_y) > differentiable_function(x, y):
+#             best_x, best_y = x, y
+#
+#     for index in range(360):
+#         vx, vy = rotate_vector(step, index)
+#         x, y = cx + vx * (arr_shape - 1), cy + vy * (arr_shape - 1)
+#         if differentiable_function(best_x, best_y) > differentiable_function(x, y):
+#             best_x, best_y = x, y
+#
+#     return best_x, best_y
+#
+
+
 def differentiable_function(x, y):
     return np.sin(x) * np.exp((1 - np.cos(y)) ** 2) + \
         np.cos(y) * np.exp((1 - np.sin(x)) ** 2) + (x - y) ** 2
@@ -22,46 +66,6 @@ def derivative_x(x, y):
 
 def derivative_y(x, y):
     return (differentiable_function(x, y + global_epsilon) - differentiable_function(x, y)) / global_epsilon
-
-
-def calculate_flip_points():
-    flip_points = np.array([0, 0])
-    points = np.zeros((360, arr_shape), dtype=bool)
-    cx, cy = centre
-
-    for i in range(arr_shape):
-        for alpha in range(360):
-            x, y = rotate_vector(step, alpha)
-            x = x * i + cx
-            y = y * i + cy
-            points[alpha][i] = derivative_x(x, y) + derivative_y(x, y) > 0
-            if i > 0 and not points[alpha][i - 1] and points[alpha][i]:
-                flip_points = np.vstack((flip_points, np.array([alpha, i - 1])))
-
-    return flip_points
-
-
-def pick_estimates(positions):
-    if len(positions) < 2:
-        return centre
-
-    vx, vy = rotate_vector(step, positions[1][0])
-    cx, cy = centre
-    best_x, best_y = cx + vx * positions[1][1], cy + vy * positions[1][1]
-
-    for index in range(2, len(positions)):
-        vx, vy = rotate_vector(step, positions[index][0])
-        x, y = cx + vx * positions[index][1], cy + vy * positions[index][1]
-        if differentiable_function(best_x, best_y) > differentiable_function(x, y):
-            best_x, best_y = x, y
-
-    for index in range(360):
-        vx, vy = rotate_vector(step, index)
-        x, y = cx + vx * (arr_shape - 1), cy + vy * (arr_shape - 1)
-        if differentiable_function(best_x, best_y) > differentiable_function(x, y):
-            best_x, best_y = x, y
-
-    return best_x, best_y
 
 
 def gradient_descent(initial_point, method='armijo', max_iter=1000, **kwargs):
@@ -136,13 +140,8 @@ def wolfe_line_search(x, y, direction, alpha_init=1.0, c1=1e-4, c2=0.9, max_iter
     return alpha
 
 
-def find_minimum():
-    flip_points = calculate_flip_points()
-    initial_guess = pick_estimates(flip_points)
-    return gradient_descent(initial_guess, method='wolfe')
+def find_minimum(initial_point):
+    return gradient_descent(initial_point, method='wolfe')
 
 
-def get_grid(grid_step):
-    samples = np.arange(-radius, radius, grid_step)
-    x, y = np.meshgrid(samples, samples)
-    return x, y, differentiable_function(x, y)
+
