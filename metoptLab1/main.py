@@ -1,4 +1,4 @@
-from graphic import *
+from grafics.graphic import *
 from math_logic import *
 
 if __name__ == '__main__':

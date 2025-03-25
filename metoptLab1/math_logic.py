@@ -2,9 +2,9 @@ import numpy as np
 
 radius = 8
 global_epsilon = 1e-9
-centre = (global_epsilon, global_epsilon)
-arr_shape = 100
-step = radius / arr_shape
+# centre = (global_epsilon, global_epsilon)
+# arr_shape = 100
+# step = radius / arr_shape
 
 
 
@@ -56,8 +56,8 @@ def differentiable_function(x, y):
         np.cos(y) * np.exp((1 - np.sin(x)) ** 2) + (x - y) ** 2
 
 
-def rotate_vector(length, a):
-    return length * np.cos(a), length * np.sin(a)
+# def rotate_vector(length, a):
+#     return length * np.cos(a), length * np.sin(a)
 
 
 def derivative_x(x, y):
@@ -141,7 +141,7 @@ def wolfe_line_search(x, y, direction, alpha_init=1.0, c1=1e-4, c2=0.9, max_iter
 
 
 def find_minimum(initial_point):
-    return gradient_descent(initial_point, method='')
+    return gradient_descent(initial_point, method='armijo')
 
 
 
