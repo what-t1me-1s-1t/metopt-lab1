@@ -83,7 +83,7 @@ def gradient_descent(initial_point, method='armijo', max_iter=1000, **kwargs):
         elif method == 'wolfe':
             alpha = wolfe_line_search(x, y, direction, **kwargs)
         else:
-            alpha = kwargs.get('learning_rate', 1e-9)
+            alpha = kwargs.get('learning_rate', 0.001)
 
         x_new = x + alpha * direction[0]
         y_new = y + alpha * direction[1]
@@ -141,7 +141,7 @@ def wolfe_line_search(x, y, direction, alpha_init=1.0, c1=1e-4, c2=0.9, max_iter
 
 
 def find_minimum(initial_point):
-    return gradient_descent(initial_point, method='wolfe')
+    return gradient_descent(initial_point, method='')
 
 
 
