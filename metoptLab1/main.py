@@ -1,153 +1,121 @@
+import matplotlib
+matplotlib.use('Agg')  # Изменяем бэкенд на 'Agg' для избежания ошибки отображения
 import numpy as np
-from abc import ABC, abstractmethod
-from typing import Callable, Optional, Tuple
+import matplotlib.pyplot as plot
 
 
-class StepSizeStrategy(ABC):
-    """Абстрактный класс для стратегии выбора шага"""
-
-    @abstractmethod
-    def get_step_size(self, f: Callable, x: np.ndarray, grad: np.ndarray,
-                      direction: np.ndarray) -> float:
-        """
-        Вычисляет размер шага для текущей итерации
-
-        Параметры:
-            f: целевая функция
-            x: текущая точка
-            grad: градиент в текущей точке
-            direction: направление спуска
-
-        Возвращает:
-            Размер шага (alpha)
-        """
-        pass
+radius = 8
+global_epsilon = 0.000000001
+centre = (global_epsilon, global_epsilon)
+arr_shape = 100
+step = radius / arr_shape
 
 
-class ArmijoStepSize(StepSizeStrategy):
-    """Реализация правила Армихо для выбора шага"""
-
-    def __init__(self, c: float = 1e-4, beta: float = 0.5, max_iter: int = 100):
-        """
-        Инициализация параметров правила Армихо
-
-        Параметры:
-            c: параметр достаточного убывания (обычно 1e-4)
-            beta: коэффициент уменьшения шага (обычно 0.1-0.8)
-            max_iter: максимальное число итераций для поиска шага
-        """
-        self.c = c
-        self.beta = beta
-        self.max_iter = max_iter
-
-    def get_step_size(self, f: Callable, x: np.ndarray,
-                      grad: np.ndarray, direction: np.ndarray) -> float:
-        """
-        Вычисляет шаг по правилу Армихо
-
-        Условие Армихо: f(x + αd) ≤ f(x) + c*α*grad(f)^T*d
-        где d - направление спуска
-        """
-        alpha = 1.0  # Начальное значение шага
-        current_value = f(x)
-        directional_derivative = grad.T @ direction
-
-        for _ in range(self.max_iter):
-            new_x = x + alpha * direction
-            new_value = f(new_x)
-
-            # Проверка условия Армихо
-            if new_value <= current_value + self.c * alpha * directional_derivative:
-                return alpha
-
-            alpha *= self.beta  # Уменьшаем шаг
-
-        return alpha  # Возвращаем последнее значение, если не сошлось
+def differentiable_function(x, y):
+    return np.sin(x) * np.exp((1 - np.cos(y)) ** 2) + \
+           np.cos(y) * np.exp((1 - np.sin(x)) ** 2) + (x - y) ** 2
 
 
-class GradientDescent:
-    """Класс градиентного спуска с возможностью выбора стратегии шага"""
-
-    def __init__(self, step_strategy: StepSizeStrategy = ArmijoStepSize(),
-                 tol: float = 1e-6, max_iter: int = 1000):
-        """
-        Инициализация метода градиентного спуска
-
-        Параметры:
-            step_strategy: стратегия выбора шага (по умолчанию Armijo)
-            tol: критерий остановки (по умолчанию 1e-6)
-            max_iter: максимальное число итераций (по умолчанию 1000)
-        """
-        self.step_strategy = step_strategy
-        self.tol = tol
-        self.max_iter = max_iter
-        self.history = []
-
-    def optimize(self, f: Callable, grad_f: Callable, x0: np.ndarray,
-                 verbose: bool = False) -> Tuple[np.ndarray, float, int]:
-        """
-        Выполняет оптимизацию методом градиентного спуска
-
-        Параметры:
-            f: целевая функция
-            grad_f: функция вычисления градиента
-            x0: начальная точка
-            verbose: флаг вывода информации о процессе
-
-        Возвращает:
-            x: найденный минимум
-            f(x): значение функции в минимуме
-            n_iter: число выполненных итераций
-        """
-        x = x0.copy()
-        self.history = [x.copy()]
-
-        for n_iter in range(1, self.max_iter + 1):
-            grad = grad_f(x)
-            direction = -grad  # Направление градиентного спуска
-
-            # Проверка критерия остановки
-            if np.linalg.norm(grad) < self.tol:
-                if verbose:
-                    print(f"Оптимизация завершена за {n_iter} итераций")
-                return x, f(x), n_iter
-
-            # Выбор шага по заданной стратегии
-            alpha = self.step_strategy.get_step_size(f, x, grad, direction)
-
-            # Обновление точки
-            x = x + alpha * direction
-            self.history.append(x.copy())
-
-            if verbose and n_iter % 100 == 0:
-                print(f"Iter {n_iter}: f(x) = {f(x):.6f}, |grad| = {np.linalg.norm(grad):.6f}")
-
-        if verbose:
-            print(f"Достигнуто максимальное число итераций {self.max_iter}")
-        return x, f(x), self.max_iter
+def rotate_vector(length, a):
+    return length * np.cos(a), length * np.sin(a)
 
 
-# Пример использования
-if __name__ == "__main__":
-    # Тестовая квадратичная функция: f(x) = x^2 + y^2
-    def quadratic(x):
-        return x[0] ** 2 + x[1] ** 2
+def derivative_x(x, y):
+    return (differentiable_function(x + global_epsilon, y) - differentiable_function(x, y)) / global_epsilon
 
 
-    def quadratic_grad(x):
-        return np.array([2 * x[0], 2 * x[1]])
+def derivative_y(x, y):
+    return (differentiable_function(x, y + global_epsilon) - differentiable_function(x, y)) / global_epsilon
 
 
-    # Начальная точка
-    x0 = np.array([10.0, 5.0])
+def calculate_flip_points():
+    flip_points = np.array([0, 0])
+    points = np.zeros((360, arr_shape), dtype=bool)
+    cx, cy = centre
 
-    # Создаем оптимизатор с правилом Армихо
-    optimizer = GradientDescent(step_strategy=ArmijoStepSize(), verbose=True)
+    for i in range(arr_shape):
+        for alpha in range(360):
+            x, y = rotate_vector(step, alpha)
+            x = x * i + cx
+            y = y * i + cy
+            points[alpha][i] = derivative_x(x, y) + derivative_y(x, y) > 0  # Исправлены аргументы
+            if i > 0 and not points[alpha][i - 1] and points[alpha][i]:
+                flip_points = np.vstack((flip_points, np.array([alpha, i - 1])))
 
-    # Запускаем оптимизацию
-    x_opt, f_opt, n_iter = optimizer.optimize(quadratic, quadratic_grad, x0, verbose=True)
+    return flip_points
 
-    print("\nРезультаты оптимизации:")
-    print(f"Найденный минимум: {x_opt}")
-    print(f"Значение функции: {f_opt:.6f}")
-    print(f"Число итераций: {n_iter}")
+
+def pick_estimates(positions):
+    if len(positions) < 2:
+        return centre  # Добавлена проверка на пустые позиции
+
+    vx, vy = rotate_vector(step, positions[1][0])
+    cx, cy = centre
+    best_x, best_y = cx + vx * positions[1][1], cy + vy * positions[1][1]
+
+    for index in range(2, len(positions)):
+        vx, vy = rotate_vector(step, positions[index][0])
+        x, y = cx + vx * positions[index][1], cy + vy * positions[index][1]
+        if differentiable_function(best_x, best_y) > differentiable_function(x, y):
+            best_x, best_y = x, y
+
+    for index in range(360):
+        vx, vy = rotate_vector(step, index)
+        x, y = cx + vx * (arr_shape - 1), cy + vy * (arr_shape - 1)
+        if differentiable_function(best_x, best_y) > differentiable_function(x, y):
+            best_x, best_y = x, y
+
+    return best_x, best_y
+
+
+def gradient_descent(best_estimates, is_x):
+    derivative = derivative_x if is_x else derivative_y
+    best_x, best_y = best_estimates
+    descent_step = step
+    value = derivative(best_x, best_y)  # Исправлен порядок аргументов
+
+    while abs(value) > global_epsilon:
+        descent_step *= 0.95
+        if is_x:
+            best_x = best_x - descent_step if value > 0 else best_x + descent_step
+        else:
+            best_y = best_y - descent_step if value > 0 else best_y + descent_step
+        value = derivative(best_x, best_y)  # Исправлен порядок
+
+    return (best_x, best_y) if is_x else (best_x, best_y)
+
+
+def find_minimum():
+    estimates = pick_estimates(calculate_flip_points())
+    optimized_y = gradient_descent(estimates, is_x=False)
+    optimized_x = gradient_descent(optimized_y, is_x=True)
+    return optimized_x
+
+
+def get_grid(grid_step):
+    samples = np.arange(-radius, radius, grid_step)
+    x, y = np.meshgrid(samples, samples)
+    return x, y, differentiable_function(x, y)
+
+
+def draw_chart(point, grid):
+    point_x, point_y, point_z = point
+    grid_x, grid_y, grid_z = grid
+    plot.rcParams.update({
+        'figure.figsize': (4, 4),
+        'figure.dpi': 200,
+        'xtick.labelsize': 4,
+        'ytick.labelsize': 4
+    })
+    ax = plot.figure().add_subplot(111, projection='3d')
+    ax.scatter(point_x, point_y, point_z, color='red')
+    ax.plot_surface(grid_x, grid_y, grid_z, rstride=5, cstride=5, alpha=0.7)
+    plot.savefig('chart.png')  # Сохраняем график в файл вместо показа
+
+
+if __name__ == '__main__':
+    min_x, min_y = find_minimum()
+    minimum = (min_x, min_y, differentiable_function(min_x, min_y))
+    draw_chart(minimum, get_grid(0.05))
+#return x, y, f(x, y)
+    print(minimum)
