@@ -1,7 +1,9 @@
+import random
+
 import numpy as np
 
 radius = 8
-global_epsilon = 1e-9
+global_epsilon = 1e-15 # НЕ МЕНЯЙТЕ
 # centre = (global_epsilon, global_epsilon)
 # arr_shape = 100
 # step = radius / arr_shape
@@ -52,8 +54,10 @@ global_epsilon = 1e-9
 
 
 def differentiable_function(x, y):
-    return np.sin(x) * np.exp((1 - np.cos(y)) ** 2) + \
-        np.cos(y) * np.exp((1 - np.sin(x)) ** 2) + (x - y) ** 2
+    # return np.sin(x) * np.exp((1 - np.cos(y)) ** 2) + \
+    #     np.cos(y) * np.exp((1 - np.sin(x)) ** 2) + (x - y) ** 2
+    # return np.abs(x**3 - y**2)
+    return x**2 + y**2 - 2
 
 
 # def rotate_vector(length, a):
@@ -94,10 +98,10 @@ def gradient_descent(initial_point, method='armijo', max_iter=1000, **kwargs):
         x, y = x_new, y_new
         trajectory.append((x, y))
 
-    return x, y
+    return x, y, trajectory
 
 
-def armijo_line_search(x, y, direction, alpha_init=1.0, c1=1e-4, rho=0.5, max_iters=10):
+def armijo_line_search(x, y, direction, alpha_init=1.0, c1=random.random(), rho=0.5, max_iters=20):
     alpha = alpha_init
     f_current = differentiable_function(x, y)
     grad = np.array([derivative_x(x, y), derivative_y(x, y)])
@@ -115,7 +119,7 @@ def armijo_line_search(x, y, direction, alpha_init=1.0, c1=1e-4, rho=0.5, max_it
     return alpha_init * (rho ** max_iters)
 
 
-def wolfe_line_search(x, y, direction, alpha_init=1.0, c1=1e-4, c2=0.9, max_iters=20):
+def wolfe_line_search(x, y, direction, alpha_init=1.0, c1=random.random(), c2=random.random(), max_iters=20):
     alpha = alpha_init
     f_current = differentiable_function(x, y)
     grad_current = np.array([derivative_x(x, y), derivative_y(x, y)])
