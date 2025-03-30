@@ -1,5 +1,6 @@
 from grafics.graphic import *
-from math_logic import *
+from searches.main import find_minimum
+from searches.shared import differentiable_function
 
 if __name__ == '__main__':
     initial_point = (4.0, 3.0)
