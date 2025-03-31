@@ -48,4 +48,4 @@ def gradient_descent(initial_point: Tuple[float, float], method: str = 'armijo',
 def find_minimum(initial_point: Tuple[float, float]) -> tuple[
     Union[Union[float, ndarray[Any, dtype[unsignedinteger[Any]]]], Any], Union[float, Any], list[
         Union[tuple[float, float], tuple[Union[ndarray[Any, dtype[unsignedinteger[Any]]], Any], Any]]]]:
-    return gradient_descent(initial_point, method='armijo')
+    return gradient_descent(initial_point, method='golden')

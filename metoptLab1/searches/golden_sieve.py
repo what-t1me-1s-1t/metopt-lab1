@@ -3,7 +3,7 @@ from .shared import differentiable_function
 
 
 def golden_section_search(x: float, y: float, direction: np.ndarray,
-                          epsilon: float = 1e-6, max_iters: int = 100) -> float:
+                          epsilon: float = 1e-6, max_iters: int = 1000) -> float:
     phi = (1 + np.sqrt(5)) / 2
     resphi = 2 - phi
 
