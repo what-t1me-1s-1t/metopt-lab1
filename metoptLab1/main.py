@@ -5,10 +5,12 @@ from searches.shared import differentiable_function
 if __name__ == '__main__':
     initial_point = (4.0, 3.0)
 
-    min_x, min_y = find_minimum(initial_point)
+    min_x, min_y, trajectory = find_minimum(initial_point)
+    print(trajectory)
     minimum = (min_x, min_y, differentiable_function(min_x, min_y))
 
     grid = get_grid(0.05)
     draw_chart(minimum, grid)
+    draw_xy_trajectory(trajectory)
 
     print(minimum)

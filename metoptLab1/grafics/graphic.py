@@ -6,13 +6,12 @@ from searches.shared import differentiable_function
 
 matplotlib.use('Agg')
 
-radius = 8
-
 
 def get_grid(grid_step):
+    radius = 5
     samples = np.arange(-radius, radius, grid_step)
     x, y = np.meshgrid(samples, samples)
-    return x, y, differentiable_function(float(x), float(y))
+    return x, y, differentiable_function(x, y)
 
 
 def draw_chart(point, grid):
@@ -45,7 +44,7 @@ def draw_chart(point, grid):
         ax.view_init(elev=30, azim=angle)
 
         plt.tight_layout()
-        plt.savefig(f'./graphics/gradient_descent_chart_{i}.png')
+        plt.savefig(f'grafics/graphicsPic/gradient_descent_chart_{i}.png')
 
 
 def draw_xy_trajectory(trajectory):
@@ -61,4 +60,4 @@ def draw_xy_trajectory(trajectory):
     plt.legend()
     plt.grid(True, linestyle='--', alpha=0.7)
 
-    plt.savefig('./graphics/xy_trajectory.png')
+    plt.savefig(f'grafics/graphicsPic/xy_trajectory.png')

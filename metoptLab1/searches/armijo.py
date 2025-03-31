@@ -3,8 +3,8 @@ from .shared import differentiable_function, derivative_x, derivative_y
 
 
 def armijo_line_search(x: float, y: float, direction: np.ndarray[float],
-                       alpha_init: float = 1.0, c1: float = 1e-4,
-                       rho: float = 0.5, max_iters: int = 10) -> float:
+                       alpha_init: float = 1.0, c1: float = 0.9,
+                       rho: float = 0.09, max_iters: int = 10) -> float:
     alpha = alpha_init
     f_current = differentiable_function(x, y)
     grad = np.array([derivative_x(x, y), derivative_y(x, y)])

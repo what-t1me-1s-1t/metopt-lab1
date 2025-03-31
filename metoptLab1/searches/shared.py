@@ -1,11 +1,12 @@
 import numpy as np
 
-global_epsilon = 1e-9
+global_epsilon = 1e-15
 
 
 def differentiable_function(x: float, y: float) -> float:
-    return np.sin(x) * np.exp((1 - np.cos(y)) ** 2) + \
-        np.cos(y) * np.exp((1 - np.sin(x)) ** 2) + (x - y) ** 2
+    # return np.sin(x) * np.exp((1 - np.cos(y)) ** 2) + \
+    #     np.cos(y) * np.exp((1 - np.sin(x)) ** 2) + (x - y) ** 2
+    return x ** 2 + y ** 2
 
 
 def derivative_x(x: float, y: float) -> float:
