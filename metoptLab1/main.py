@@ -1,8 +1,8 @@
 import matplotlib
+
 matplotlib.use('Agg')  # Изменяем бэкенд на 'Agg' для избежания ошибки отображения
 import numpy as np
 import matplotlib.pyplot as plot
-
 
 radius = 8
 global_epsilon = 0.000000001
@@ -13,7 +13,7 @@ step = radius / arr_shape
 
 def differentiable_function(x, y):
     return np.sin(x) * np.exp((1 - np.cos(y)) ** 2) + \
-           np.cos(y) * np.exp((1 - np.sin(x)) ** 2) + (x - y) ** 2
+        np.cos(y) * np.exp((1 - np.sin(x)) ** 2) + (x - y) ** 2
 
 
 def rotate_vector(length, a):
@@ -76,12 +76,12 @@ def gradient_descent(initial_point, method='armijo', max_iter=1000, **kwargs):
         dx = derivative_x(x, y)
         dy = derivative_y(x, y)
         grad = np.array([dx, dy])
-        direction = -grad
+        direction = -np.sign(grad)
 
         if method == 'armijo':
             alpha = armijo_line_search(x, y, direction, **kwargs)
         elif method == 'wolfe':
-            alpha = wolfe_line_search(x, y, direction, **kwargs)
+            alpha = wolfe_line_search(x, y, **kwargs)
         else:
             alpha = kwargs.get('learning_rate', 0.000000001)
 
@@ -115,30 +115,29 @@ def armijo_line_search(x, y, direction, alpha_init=1.0, c1=1e-4, rho=0.5, max_it
     return alpha_init * (rho ** max_iters)
 
 
-def wolfe_line_search(x, y, direction, alpha_init=1.0, c1=1e-4, c2=0.9, max_iters=20):
+def wolfe_line_search(x, y, alpha_init=1.0, c1=1e-4, c2=0.9, max_iters=20):
     alpha = alpha_init
-    f_current = differentiable_function(x, y)
-    grad_current = np.array([derivative_x(x, y), derivative_y(x, y)])
-    slope = c1 * np.dot(grad_current, direction)
+    f = differentiable_function(x, y)
+    grad = np.array([derivative_x(x, y), derivative_y(x, y)])
+    derivative = np.dot(grad, -np.sign(grad))
 
     for _ in range(max_iters):
-        x_new = x + alpha * direction[0]
-        y_new = y + alpha * direction[1]
+        x_new = x + alpha
+        y_new = y + alpha
         f_new = differentiable_function(x_new, y_new)
-        grad_new = np.array([derivative_x(x_new, y_new), derivative_y(x_new, y_new)])
+        grad = np.array([derivative_x(x_new, y_new), derivative_y(x_new, y_new)])
+        direction = -np.sign(grad)
+        derivative_new = np.dot(grad, direction)
 
-        if f_new > f_current + alpha * slope:
+        if derivative_new >= c2 * derivative:
+            return alpha
+
+        if f_new > f + alpha * c1 * derivative:
             alpha *= 0.5
-            continue
-
-        if np.dot(grad_new, direction) < c2 * np.dot(grad_current, direction):
+        else:
             alpha *= 1.5
-            continue
-
-        return alpha
 
     return alpha
-
 
 
 def find_minimum():
@@ -172,5 +171,5 @@ if __name__ == '__main__':
     min_x, min_y = find_minimum()
     minimum = (min_x, min_y, differentiable_function(min_x, min_y))
     draw_chart(minimum, get_grid(0.05))
-#return x, y, f(x, y)
+    # return x, y, f(x, y)
     print(minimum)
