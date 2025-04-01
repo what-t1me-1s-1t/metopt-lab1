@@ -26,13 +26,13 @@ def gradient_descent(initial_point: Tuple[float, float], method: str, max_iter: 
         if method == 'armijo':
             alpha = armijo_line_search(x, y, **kwargs)
         elif method == 'wolfe':
-            alpha = wolfe_line_search(x, y, direction, **kwargs)
+            alpha = wolfe_line_search(x, y, **kwargs)
         elif method == 'golden':
             alpha = golden_section_search(x, y, direction, **kwargs)
         elif method == 'ternary':
             alpha = ternary_line_search(x, y, direction, **kwargs)
         else:
-            alpha = kwargs.get('learning_rate', 0.5)
+            alpha = kwargs.get('learning_rate', 0.3)
 
         x_new = x + alpha * direction[0]
         y_new = y + alpha * direction[1]
@@ -49,4 +49,4 @@ def gradient_descent(initial_point: Tuple[float, float], method: str, max_iter: 
 def find_minimum(initial_point: Tuple[float, float]) -> tuple[
     Union[Union[float, ndarray[Any, dtype[unsignedinteger[Any]]]], Any], Union[float, Any], list[
         Union[tuple[float, float], tuple[Union[ndarray[Any, dtype[unsignedinteger[Any]]], Any], Any]]]]:
-    return gradient_descent(initial_point, method='armijo', max_iter=1000)
+    return gradient_descent(initial_point, method='wolfe', max_iter=1000)

@@ -7,7 +7,7 @@ from searches.shared import differentiable_function
 # 1, 1
 # 4, 3
 if __name__ == '__main__':
-    initial_point = (0.4, 0.2)
+    initial_point = (4, 3)
 
     min_x, min_y, trajectory = find_minimum(initial_point)
     print(trajectory)
