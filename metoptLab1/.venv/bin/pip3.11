@@ -1,4 +1,4 @@
-#!/home/anon/Desktop/metopt-lab1/metoptLab1/.venv/bin/python
+#!/home/lina/Desktop/ITMO/2Course/4Semester/met-opt/metopt-lab1/metoptLab1/.venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

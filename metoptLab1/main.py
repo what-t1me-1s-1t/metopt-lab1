@@ -76,7 +76,7 @@ def gradient_descent(initial_point, method='armijo', max_iter=1000, **kwargs):
         dx = derivative_x(x, y)
         dy = derivative_y(x, y)
         grad = np.array([dx, dy])
-        direction = -grad
+        direction = -np.sign(grad)
 
         if method == 'armijo':
             alpha = armijo_line_search(x, y, direction, **kwargs)
@@ -97,22 +97,21 @@ def gradient_descent(initial_point, method='armijo', max_iter=1000, **kwargs):
     return x, y
 
 
-def armijo_line_search(x, y, direction, alpha_init=1.0, c1=1e-4, rho=0.5, max_iters=10):
+def armijo_line_search(x, y, direction, alpha_init=0.9, c1=1e-4, q=0.5, max_iters=10):
     alpha = alpha_init
     f_current = differentiable_function(x, y)
-    grad = np.array([derivative_x(x, y), derivative_y(x, y)])
-    slope = c1 * np.dot(grad, direction)
 
     for _ in range(max_iters):
-        x_new = x + alpha * direction[0]
-        y_new = y + alpha * direction[1]
-        f_new = differentiable_function(x_new, y_new)
+        f_new = differentiable_function(x + alpha, y + alpha)
+        grad = np.array([derivative_x(x, y), derivative_y(x, y)])
+        derivative = np.dot(grad, direction)
 
-        if f_new <= f_current + alpha * slope:
+        if f_new < f_current + c1 * alpha * derivative:
             return alpha
-        alpha *= rho
 
-    return alpha_init * (rho ** max_iters)
+        alpha = q * alpha
+
+    return alpha
 
 
 def wolfe_line_search(x, y, direction, alpha_init=1.0, c1=1e-4, c2=0.9, max_iters=20):
