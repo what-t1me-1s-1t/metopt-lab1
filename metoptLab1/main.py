@@ -1,8 +1,8 @@
 import matplotlib
+
 matplotlib.use('Agg')  # Изменяем бэкенд на 'Agg' для избежания ошибки отображения
 import numpy as np
 import matplotlib.pyplot as plot
-
 
 radius = 8
 global_epsilon = 0.000000001
@@ -13,7 +13,7 @@ step = radius / arr_shape
 
 def differentiable_function(x, y):
     return np.sin(x) * np.exp((1 - np.cos(y)) ** 2) + \
-           np.cos(y) * np.exp((1 - np.sin(x)) ** 2) + (x - y) ** 2
+        np.cos(y) * np.exp((1 - np.sin(x)) ** 2) + (x - y) ** 2
 
 
 def rotate_vector(length, a):
@@ -76,10 +76,10 @@ def gradient_descent(initial_point, method='armijo', max_iter=1000, **kwargs):
         dx = derivative_x(x, y)
         dy = derivative_y(x, y)
         grad = np.array([dx, dy])
-        direction = -np.sign(grad)
+        direction = -grad
 
         if method == 'armijo':
-            alpha = armijo_line_search(x, y, direction, **kwargs)
+            alpha = armijo_line_search(x, y, **kwargs)
         elif method == 'wolfe':
             alpha = wolfe_line_search(x, y, direction, **kwargs)
         else:
@@ -97,13 +97,16 @@ def gradient_descent(initial_point, method='armijo', max_iter=1000, **kwargs):
     return x, y
 
 
-def armijo_line_search(x, y, direction, alpha_init=0.9, c1=1e-4, q=0.5, max_iters=10):
+def armijo_line_search(x, y, alpha_init=0.9, c1=1e-4, q=0.5, max_iters=10):
     alpha = alpha_init
     f_current = differentiable_function(x, y)
 
     for _ in range(max_iters):
-        f_new = differentiable_function(x + alpha, y + alpha)
-        grad = np.array([derivative_x(x, y), derivative_y(x, y)])
+        x_new = x + alpha
+        y_new = y + alpha
+        f_new = differentiable_function(x_new, y_new)
+        grad = np.array([derivative_x(x_new, y_new), derivative_y(x_new, y_new)])
+        direction = -np.sign(grad)
         derivative = np.dot(grad, direction)
 
         if f_new < f_current + c1 * alpha * derivative:
@@ -139,7 +142,6 @@ def wolfe_line_search(x, y, direction, alpha_init=1.0, c1=1e-4, c2=0.9, max_iter
     return alpha
 
 
-
 def find_minimum():
     flip_points = calculate_flip_points()
     initial_guess = pick_estimates(flip_points)
@@ -171,5 +173,5 @@ if __name__ == '__main__':
     min_x, min_y = find_minimum()
     minimum = (min_x, min_y, differentiable_function(min_x, min_y))
     draw_chart(minimum, get_grid(0.05))
-#return x, y, f(x, y)
+    # return x, y, f(x, y)
     print(minimum)
