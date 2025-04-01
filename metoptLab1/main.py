@@ -76,7 +76,7 @@ def gradient_descent(initial_point, method='armijo', max_iter=1000, **kwargs):
         dx = derivative_x(x, y)
         dy = derivative_y(x, y)
         grad = np.array([dx, dy])
-        direction = -grad
+        direction = -np.sign(grad)
 
         if method == 'armijo':
             alpha = armijo_line_search(x, y, **kwargs)
