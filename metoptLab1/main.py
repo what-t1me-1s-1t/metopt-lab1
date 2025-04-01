@@ -2,8 +2,12 @@ from grafics.graphic import *
 from searches.main import find_minimum
 from searches.shared import differentiable_function
 
+# 0.4, 0.2
+# 2, 4
+# 1, 1
+# 4, 3
 if __name__ == '__main__':
-    initial_point = (4.0, 3.0)
+    initial_point = (0.4, 0.2)
 
     min_x, min_y, trajectory = find_minimum(initial_point)
     print(trajectory)

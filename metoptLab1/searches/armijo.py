@@ -1,20 +1,26 @@
 import numpy as np
 from .shared import differentiable_function, derivative_x, derivative_y
 
+def armijo_line_search(x, y, step=0.5, c1=1e-4, q=0.5, max_iters=1000):
+    alpha = step
+    f_current = differentiable_function(x, y)
+    grad = np.array([derivative_x(x, y), derivative_y(x, y)])
+    direction = -grad
 
-def armijo_line_search(x: float, y: float, direction: np.ndarray[float],
-                       alpha_init: float = 1, c1: float = 0.1,
-                       rho: float = 0.1, max_iters: int = 1000) -> float:
-    grad_x = derivative_x(x, y)
-    grad_y = derivative_y(x, y)
-    grad = np.array([grad_x, grad_y])
-
-    t = -c1 * np.dot(grad, direction)
-
-    alpha = alpha_init
     for _ in range(max_iters):
-        if differentiable_function(x, y) - differentiable_function(x + alpha * direction[0], y + alpha * direction[1]) >= alpha * t:
+        x_new = x + alpha * direction[0]
+        y_new = y + alpha * direction[1]
+
+        f_new = differentiable_function(x_new, y_new)
+        derivative = np.dot(grad, direction)
+
+        if f_new < f_current + c1 * alpha * derivative:
             return alpha
-        alpha *= rho
+
+        alpha = q * alpha
+
+        grad = np.array([derivative_x(x_new, y_new), derivative_y(x_new, y_new)])
+        direction = -grad
 
     return alpha
+

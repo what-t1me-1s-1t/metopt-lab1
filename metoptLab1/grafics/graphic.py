@@ -53,7 +53,7 @@ def draw_xy_trajectory(trajectory):
 
     trajectory = np.array(trajectory)
 
-    plt.plot(trajectory[:, 0], trajectory[:, 1], 'ro-', markersize=5, linewidth=2, label='Gradient Descent Path')
+    plt.plot(trajectory[:, 0], trajectory[:, 1], 'ro-', markersize=5, linewidth=1, label='Gradient Descent Path')
     plt.title('Gradient Descent Trajectory in XY Plane')
     plt.xlabel('X-axis')
     plt.ylabel('Y-axis')
