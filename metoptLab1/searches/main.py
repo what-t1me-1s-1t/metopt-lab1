@@ -1,8 +1,6 @@
 import numpy as np
 from typing import Tuple, Union, Any
 
-from numpy import ndarray, dtype, unsignedinteger
-
 from .shared import derivative_x, derivative_y
 from .armijo import armijo_line_search
 from .wolfe import wolfe_line_search
@@ -10,12 +8,21 @@ from .golden_sieve import golden_section_search
 from .ternary_search import ternary_line_search
 
 
-def gradient_descent(initial_point: Tuple[float, float], method: str, max_iter: int = 1000, **kwargs) -> \
-        tuple[Union[Union[float, np.ndarray[Any, np.dtype[np.unsignedinteger[Any]]]], Any], Union[float, Any], list[
-            Union[tuple[float, float], tuple[Union[np.ndarray[Any, np.dtype[np.unsignedinteger[Any]]], Any], Any]]]]:
+def gradient_descent(
+        initial_point: Tuple[float, float],
+        method: str,
+        max_iter: int,
+        noise_left_bound: float = 0,
+        noise_right_bound: float = 0,
+        **kwargs
+) -> tuple[
+    Union[Union[float, np.ndarray[Any, np.dtype[np.unsignedinteger[Any]]]], Any],
+    Union[float, Any],
+    list[Union[tuple[float, float], tuple[Union[np.ndarray[Any, np.dtype[np.unsignedinteger[Any]]], Any], Any]]]
+]:
     x, y = initial_point
     trajectory = [(x, y)]
-    eps = 1e-15
+    eps = 1e-6
 
     for _ in range(max_iter):
         dx = derivative_x(x, y)
@@ -24,7 +31,7 @@ def gradient_descent(initial_point: Tuple[float, float], method: str, max_iter: 
         direction = -grad
 
         if method == 'armijo':
-            alpha = armijo_line_search(x, y, **kwargs)
+            alpha = armijo_line_search(x, y, noise_left_bound, noise_right_bound, **kwargs)
         elif method == 'wolfe':
             alpha = wolfe_line_search(x, y, **kwargs)
         elif method == 'golden':
@@ -32,7 +39,7 @@ def gradient_descent(initial_point: Tuple[float, float], method: str, max_iter: 
         elif method == 'ternary':
             alpha = ternary_line_search(x, y, direction, **kwargs)
         else:
-            alpha = kwargs.get('learning_rate', 0.3)
+            alpha = kwargs.get('learning_rate', 0.5)
 
         x_new = x + alpha * direction[0]
         y_new = y + alpha * direction[1]
@@ -44,9 +51,3 @@ def gradient_descent(initial_point: Tuple[float, float], method: str, max_iter: 
         trajectory.append((x, y))
 
     return x, y, trajectory
-
-
-def find_minimum(initial_point: Tuple[float, float]) -> tuple[
-    Union[Union[float, ndarray[Any, dtype[unsignedinteger[Any]]]], Any], Union[float, Any], list[
-        Union[tuple[float, float], tuple[Union[ndarray[Any, dtype[unsignedinteger[Any]]], Any], Any]]]]:
-    return gradient_descent(initial_point, method='wolfe', max_iter=1000)

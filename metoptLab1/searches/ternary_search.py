@@ -2,8 +2,13 @@ import numpy as np
 from .shared import differentiable_function
 
 
-def ternary_line_search(x: float, y: float, direction: np.ndarray[float],
-                        epsilon: float = 1e-6, max_iters: int = 1000) -> float:
+def ternary_line_search(
+        x: float,
+        y: float,
+        direction: np.ndarray[float],
+        epsilon: float = 1e-6,
+        max_iters: int = 1000
+) -> float:
     left = 0
     right = 1
 

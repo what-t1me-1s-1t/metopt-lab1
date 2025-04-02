@@ -1,5 +1,5 @@
 from grafics.graphic import *
-from searches.main import find_minimum
+from searches.main import gradient_descent
 from searches.shared import differentiable_function
 
 # 0.4, 0.2
@@ -7,9 +7,15 @@ from searches.shared import differentiable_function
 # 1, 1
 # 4, 3
 if __name__ == '__main__':
-    initial_point = (4, 3)
+    initial_point = (3, 3)
 
-    min_x, min_y, trajectory = find_minimum(initial_point)
+    min_x, min_y, trajectory = gradient_descent(
+        initial_point,
+        method='armijo',
+        noise_left_bound=-0.001,
+        noise_right_bound=0.001,
+        max_iter=1000
+    )
     print(trajectory)
     minimum = (min_x, min_y, differentiable_function(min_x, min_y))
 

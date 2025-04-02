@@ -1,8 +1,15 @@
 import numpy as np
-from .shared import differentiable_function, derivative_x, derivative_y, global_epsilon
+from .shared import differentiable_function, derivative_x, derivative_y
 
 
-def wolfe_line_search(x, y, alpha_init=0.8, c1=1e-4, c2=0.5, max_iters=1000):
+def wolfe_line_search(
+        x: float,
+        y: float,
+        alpha_init: float = 0.8,
+        c1: float = 1e-4,
+        c2: float = 0.5,
+        max_iters: int = 1000
+) -> float:
     alpha = alpha_init
     f_current = differentiable_function(x, y)
     grad = np.array([derivative_x(x, y), derivative_y(x, y)])
