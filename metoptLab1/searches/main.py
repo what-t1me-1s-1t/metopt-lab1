@@ -12,8 +12,7 @@ def gradient_descent(
         initial_point: Tuple[float, float],
         method: str,
         max_iter: int,
-        noise_left_bound: float = 0,
-        noise_right_bound: float = 0,
+        noise_level: float = 0,
         **kwargs
 ) -> tuple[
     Union[Union[float, np.ndarray[Any, np.dtype[np.unsignedinteger[Any]]]], Any],
@@ -31,7 +30,7 @@ def gradient_descent(
         direction = -grad
 
         if method == 'armijo':
-            alpha = armijo_line_search(x, y, noise_left_bound, noise_right_bound, **kwargs)
+            alpha = armijo_line_search(x, y, noise_level, **kwargs)
         elif method == 'wolfe':
             alpha = wolfe_line_search(x, y, **kwargs)
         elif method == 'golden':
@@ -39,7 +38,7 @@ def gradient_descent(
         elif method == 'ternary':
             alpha = ternary_line_search(x, y, direction, **kwargs)
         else:
-            alpha = kwargs.get('learning_rate', 0.5)
+            alpha = kwargs.get('learning_rate', 3)
 
         x_new = x + alpha * direction[0]
         y_new = y + alpha * direction[1]
