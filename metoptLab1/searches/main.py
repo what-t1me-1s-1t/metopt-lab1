@@ -38,7 +38,7 @@ def gradient_descent(
         elif method == 'ternary':
             alpha = ternary_line_search(x, y, direction, **kwargs)
         else:
-            alpha = kwargs.get('learning_rate', 3)
+            alpha = kwargs.get('learning_rate', 0.06)
 
         x_new = x + alpha * direction[0]
         y_new = y + alpha * direction[1]

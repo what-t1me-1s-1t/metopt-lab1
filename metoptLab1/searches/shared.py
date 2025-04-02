@@ -1,6 +1,6 @@
 import numpy as np
 
-global_epsilon = 1e-15
+global_epsilon = 1e-8
 
 
 def differentiable_function(x: float, y: float, noise_level: float = 0) -> float:

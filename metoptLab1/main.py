@@ -7,12 +7,12 @@ from searches.shared import differentiable_function
 # 1, 1
 # 4, 3
 if __name__ == '__main__':
-    initial_point = (-0.1, -0.5)
+    initial_point = (4, 3)
 
     min_x, min_y, trajectory = gradient_descent(
         initial_point,
         method='armijo',
-        noise_level=0.0000000000000001,
+        noise_level=1e-9,
         max_iter=1000
     )
     print(trajectory)
