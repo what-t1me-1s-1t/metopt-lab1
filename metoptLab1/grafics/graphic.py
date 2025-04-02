@@ -2,7 +2,7 @@ import matplotlib
 import numpy as np
 import matplotlib.pyplot as plt
 
-from searches.shared import differentiable_function
+from searches.shared import differentiable_function_sp,differentiable_function
 
 matplotlib.use('Agg')
 
@@ -14,8 +14,9 @@ def get_grid(grid_step):
     return x, y, differentiable_function(x, y)
 
 
-def draw_chart(point, grid):
+def draw_chart(point, grid, start_point=None):
     point_x, point_y, point_z = point
+
     grid_x, grid_y, grid_z = grid
 
     plt.rcParams.update({
@@ -25,7 +26,7 @@ def draw_chart(point, grid):
         'ytick.labelsize': 10
     })
 
-    angles = [30, 60, 90]
+    angles = [30, 60, 90, 120, 150]
     for i, angle in enumerate(angles):
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
@@ -35,13 +36,18 @@ def draw_chart(point, grid):
 
         ax.scatter(point_x, point_y, point_z, color='red', s=100, label='Minimum Point')
 
+        if start_point:
+            start_x, start_y = start_point
+            start_z = differentiable_function_sp(np.array([start_x, start_y]))
+            ax.scatter(start_x, start_y, start_z, color='blue', s=100, label='Start Point')
+
         ax.set_title(f'3D Surface Plot - Angle {angle}°', fontsize=12)
         ax.set_xlabel('X-axis', fontsize=10)
         ax.set_ylabel('Y-axis', fontsize=10)
         ax.set_zlabel('Function Value', fontsize=10)
         ax.legend()
 
-        ax.view_init(elev=30, azim=angle)
+        ax.view_init(elev=10, azim=angle)
 
         plt.tight_layout()
         plt.savefig(f'grafics/graphicsPic/gradient_descent_chart_{i}.png')
@@ -49,7 +55,6 @@ def draw_chart(point, grid):
 
 def draw_xy_trajectory(trajectory):
     plt.figure(figsize=(6, 6), dpi=300)
-    print(len(trajectory))
 
     trajectory = np.array(trajectory)
 

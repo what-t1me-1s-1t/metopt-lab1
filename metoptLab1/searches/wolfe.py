@@ -5,9 +5,9 @@ from .shared import differentiable_function, derivative_x, derivative_y
 def wolfe_line_search(
         x: float,
         y: float,
-        alpha_init: float = 0.8,
+        alpha_init: float = 0.6,
         c1: float = 1e-4,
-        c2: float = 0.5,
+        c2: float = 0.2,
         max_iters: int = 1000
 ) -> float:
     alpha = alpha_init
