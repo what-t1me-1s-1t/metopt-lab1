@@ -5,6 +5,14 @@ from grafics.graphic import get_grid, draw_chart, draw_xy_trajectory
 from searches.main import gradient_descent
 from searches.shared import differentiable_function, differentiable_function_sp
 
+
+def print_method_info(method_name, rate_strategy_name, minimum, trajectory_len):
+    print(f"  Метод {method_name} ({rate_strategy_name}):")
+    print(f"   X = {minimum[0]:.10f}, Y = {minimum[1]:.10f}")
+    print(f"   F(X, Y) = {minimum[2]:.10f}")
+    print(f"   Итерации: {trajectory_len}\n")
+
+
 if __name__ == '__main__':
     initial_point = (0, 0)
 
@@ -18,23 +26,14 @@ if __name__ == '__main__':
     print(trajectory)
 
     our_minimum = (min_x, min_y, differentiable_function(min_x, min_y))
-
     res_scipy = minimize(differentiable_function_sp, np.array(initial_point), method='BFGS', tol=1e-8)
     scipy_minimum = (res_scipy.x[0], res_scipy.x[1], res_scipy.fun)
 
-    print("\n Результаты исследований\n")
-    print(f"  Метод градиентного спуска (Wolfe):")
-    print(f"   X = {our_minimum[0]:.10f}, Y = {our_minimum[1]:.10f}")
-    print(f"   F(X, Y) = {our_minimum[2]:.10f}")
-    print(f"   Итерации: {len(trajectory)}\n")
-
-    print(f"  Метод Nelder-Mead (Scipy):")
-    print(f"   X = {scipy_minimum[0]:.10f}, Y = {scipy_minimum[1]:.10f}")
-    print(f"   F(X, Y) = {scipy_minimum[2]:.10f}")
-    print(f"   Итерации: {res_scipy.nit}\n")
+    print("\nРезультаты исследований\n")
+    print_method_info("градиентного спуска", "Wolfe", our_minimum, len(trajectory))
+    print_method_info("Nelder-Mead", "Armijo", scipy_minimum, res_scipy.nit)
 
     methods = ["BFGS", "Nelder-Mead"]
-
     results = {}
 
     for method in methods:
@@ -46,8 +45,7 @@ if __name__ == '__main__':
             "Iterations": res.nit if "nit" in res else "N/A"
         }
 
-    # Вывод результатов в красивом виде
-    print("\n🔹 Сравнение методов оптимизации 🔹\n")
+    print("\nСравнение методов оптимизации\n")
     for method, data in results.items():
         print(f"  Метод {method}:")
         print(f"   X = {data['X']:.6f}, Y = {data['Y']:.6f}")

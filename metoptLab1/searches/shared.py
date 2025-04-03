@@ -5,8 +5,6 @@ global_epsilon = 1e-8
 
 def differentiable_function(x: float, y: float, noise_level: float = 0) -> float:
     # return x ** 2 + y ** 2
-    # return 0.26*(x**2 + y**2) - 0.48*x*y
-    # return (1 + x)**2 +(y - x**2)**2
     # return 0.5*(x**2)+0.25*y**2-1
     return (x ** 2 + y - 11) ** 2 + (x + y ** 2 - 7) ** 2 + np.random.normal(0, noise_level)
 
